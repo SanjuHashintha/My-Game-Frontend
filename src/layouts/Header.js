@@ -39,9 +39,15 @@ const Header = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userId = localStorage.getItem("userId"); // Example user ID
+        const userId = localStorage.getItem("userId");
+        const token = localStorage.getItem("access_token");
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        };
         const response = await axios.get(
-          `http://localhost:8080/api/users?id=${userId}`
+          `http://localhost:8080/api/users?id=${userId}`,
+          { headers }
         );
         if (response.data.payload[0].profilePic) {
           setProfilePic(
