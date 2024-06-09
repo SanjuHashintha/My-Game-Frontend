@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Navbar,
@@ -13,12 +13,13 @@ import {
   Dropdown,
   Button,
 } from "reactstrap";
-import Logo from "./Logo";
 import { ReactComponent as LogoWhite } from "../assets/images/logos/materialprowhite.svg";
 import user1 from "../assets/images/users/user4.jpg";
+import axios from "axios";
 
 const Header = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [profilePic, setProfilePic] = useState(user1);
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
@@ -29,11 +30,37 @@ const Header = () => {
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
+
+  const logout = () => {
+    localStorage.clear();
+    localStorage.removeItem("access_token");
+    window.location.reload();
+  };
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem("userId"); // Example user ID
+        const response = await axios.get(
+          `http://localhost:8080/api/users?id=${userId}`
+        );
+        if (response.data.payload[0].profilePic) {
+          setProfilePic(
+            `http://localhost:8080${response.data.payload[0].profilePic}`
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <Navbar color="primary" dark expand="md" className="fix-header">
       <div className="d-flex align-items-center">
         <div className="d-lg-block d-none me-5 pe-3">
-          <Logo />
+          <img src="./game.png" width="30" alt="game" />
         </div>
         <NavbarBrand href="/">
           <LogoWhite className=" d-lg-none" />
@@ -88,7 +115,7 @@ const Header = () => {
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle color="transparent">
             <img
-              src={user1}
+              src={profilePic}
               alt="profile"
               className="rounded-circle"
               width="30"
@@ -101,7 +128,13 @@ const Header = () => {
             <DropdownItem divider />
             <DropdownItem>My Balance</DropdownItem>
             <DropdownItem>Inbox</DropdownItem>
-            <DropdownItem>Logout</DropdownItem>
+            <DropdownItem
+              onClick={() => {
+                logout();
+              }}
+            >
+              Logout
+            </DropdownItem>
           </DropdownMenu>
         </Dropdown>
       </Collapse>

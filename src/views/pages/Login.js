@@ -41,9 +41,14 @@ const Login = () => {
       });
 
       if (response.data.status === 200) {
+        localStorage.setItem("userId", response.data.payload._id);
         localStorage.setItem("access_token", response.data.payload.token);
         localStorage.setItem("role", response.data.payload.role);
         localStorage.setItem("username", response.data.payload.username);
+        localStorage.setItem(
+          "fullName",
+          response.data.payload.firstName + " " + response.data.payload.lastName
+        );
         navigate("/starter");
       } else if (response.data.status === 404) {
         setAlert({

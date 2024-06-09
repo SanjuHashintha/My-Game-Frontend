@@ -1,9 +1,10 @@
+import React, { useEffect, useState } from "react";
 import { Button, Nav, NavItem } from "reactstrap";
 import { Link, useLocation } from "react-router-dom";
+import axios from "axios";
 import user1 from "../assets/images/users/user4.jpg";
 import probg from "../assets/images/bg/download.jpg";
 
-// Function to check if the user is an admin
 const isAdmin = () => {
   return localStorage.getItem("role") === "admin";
 };
@@ -28,7 +29,7 @@ const navigation = [
     title: "Buttons",
     href: "/buttons",
     icon: "bi bi-hdd-stack",
-    adminOnly: true, // Add this property
+    adminOnly: true,
   },
   {
     title: "Cards",
@@ -63,10 +64,34 @@ const navigation = [
 ];
 
 const Sidebar = () => {
+  const [userData, setUserData] = useState(null);
+  const [profilePic, setProfilePic] = useState(user1);
+  let location = useLocation();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = localStorage.getItem("userId"); // Example user ID
+        const response = await axios.get(
+          `http://localhost:8080/api/users?id=${userId}`
+        );
+        setUserData(response.data.payload[0]);
+        if (response.data.payload[0].profilePic) {
+          setProfilePic(
+            `http://localhost:8080${response.data.payload[0].profilePic}`
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const showMobilemenu = () => {
     document.getElementById("sidebarArea").classList.toggle("showSidebar");
   };
-  let location = useLocation();
 
   return (
     <div>
@@ -76,7 +101,12 @@ const Sidebar = () => {
         style={{ background: `url(${probg}) no-repeat` }}
       >
         <div className="p-3 d-flex">
-          <img src={user1} alt="user" width="50" className="rounded-circle" />
+          <img
+            src={profilePic}
+            alt="user"
+            width="50"
+            className="rounded-circle"
+          />
           <Button
             color="white"
             className="ms-auto text-white d-lg-none"
@@ -85,12 +115,14 @@ const Sidebar = () => {
             <i className="bi bi-x"></i>
           </Button>
         </div>
-        <div className="bg-dark text-white p-2 opacity-75">Steave Rojer</div>
+        <div className="bg-dark text-white p-2 opacity-75">
+          {userData && userData.firstName + " " + userData.lastName}
+        </div>
       </div>
       <div className="p-3 mt-2">
         <Nav vertical className="sidebarNav">
           {navigation
-            .filter((navi) => !navi.adminOnly || isAdmin()) // Filter based on adminOnly property
+            .filter((navi) => !navi.adminOnly || isAdmin())
             .map((navi, index) => (
               <NavItem key={index} className="sidenav-bg">
                 <Link
