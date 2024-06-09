@@ -14,68 +14,49 @@ import {
   CardText,
 } from "reactstrap";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import AlertMessage from "../../common/AlertMessage";
 
-const Login = () => {
+const Register = () => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [alert, setAlert] = useState({ message: "", status: "" });
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = (e) => {
     e.preventDefault();
-
-    if (!email || !password) {
-      setAlert({
-        message: "Email and password are required.",
-        status: "danger",
-      });
-      return;
-    }
-
-    try {
-      const response = await axios.post(`http://localhost:8080/api/signin`, {
-        email,
-        password,
-      });
-
-      if (response.data.status === 200) {
-        localStorage.setItem("access_token", response.data.payload.token);
-        localStorage.setItem("role", response.data.payload.role);
-        localStorage.setItem("username", response.data.payload.username);
-        navigate("/starter");
-      } else if (response.data.status === 404) {
-        setAlert({
-          message: `Login Failed: ${response.data.message}`,
-          status: "danger",
-        });
-      }
-    } catch (error) {
-      setAlert({
-        message: `Login Failed: Something when wrong`,
-        status: "danger",
-      });
-      console.error("Axios Error:", error);
-    }
+    // Handle registration logic here
+    console.log("Username:", username);
+    console.log("Email:", email);
+    console.log("Password:", password);
+    navigate("/login");
   };
 
   return (
     <Container
-      className="d-flex vh-100"
-      style={{ alignItems: "center", justifyContent: "center" }}
+      className="d-flex align-items-center justify-content-center"
+      style={{ height: "100vh" }}
     >
       <Row className="justify-content-center w-100">
-        <Col md={6} lg={4}>
-          <Card>
+        <Col md={6}>
+          {" "}
+          {/* Adjust the width here */}
+          <Card style={{ width: "100%", margin: "0 auto" }}>
             <CardBody>
-              {alert.message && (
-                <AlertMessage message={alert.message} status={alert.status} />
-              )}
               <CardTitle tag="h5" className="text-center mb-4">
-                Login
+                Register
               </CardTitle>
-              <Form onSubmit={handleLogin} autoComplete="on">
+              <Form onSubmit={handleRegister}>
+                <FormGroup>
+                  <Label for="username">Username</Label>
+                  <Input
+                    type="text"
+                    name="username"
+                    id="username"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </FormGroup>
                 <FormGroup>
                   <Label for="email">Email</Label>
                   <Input
@@ -85,6 +66,7 @@ const Login = () => {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                   />
                 </FormGroup>
                 <FormGroup>
@@ -96,14 +78,15 @@ const Login = () => {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                   />
                 </FormGroup>
                 <Button color="primary" type="submit" block>
-                  Login
+                  Register
                 </Button>
               </Form>
               <CardText className="text-center mt-3">
-                Don't have an account? <Link to="/register">Register</Link>
+                Already have an account? <Link to="/login">Login</Link>
               </CardText>
             </CardBody>
           </Card>
@@ -113,4 +96,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -3,6 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import user1 from "../assets/images/users/user4.jpg";
 import probg from "../assets/images/bg/download.jpg";
 
+// Function to check if the user is an admin
+const isAdmin = () => {
+  return localStorage.getItem("role") === "admin";
+};
+
 const navigation = [
   {
     title: "Dashboard",
@@ -23,6 +28,7 @@ const navigation = [
     title: "Buttons",
     href: "/buttons",
     icon: "bi bi-hdd-stack",
+    adminOnly: true, // Add this property
   },
   {
     title: "Cards",
@@ -83,21 +89,23 @@ const Sidebar = () => {
       </div>
       <div className="p-3 mt-2">
         <Nav vertical className="sidebarNav">
-          {navigation.map((navi, index) => (
-            <NavItem key={index} className="sidenav-bg">
-              <Link
-                to={navi.href}
-                className={
-                  location.pathname === navi.href
-                    ? "active nav-link py-3"
-                    : "nav-link text-secondary py-3"
-                }
-              >
-                <i className={navi.icon}></i>
-                <span className="ms-3 d-inline-block">{navi.title}</span>
-              </Link>
-            </NavItem>
-          ))}
+          {navigation
+            .filter((navi) => !navi.adminOnly || isAdmin()) // Filter based on adminOnly property
+            .map((navi, index) => (
+              <NavItem key={index} className="sidenav-bg">
+                <Link
+                  to={navi.href}
+                  className={
+                    location.pathname === navi.href
+                      ? "active nav-link py-3"
+                      : "nav-link text-secondary py-3"
+                  }
+                >
+                  <i className={navi.icon}></i>
+                  <span className="ms-3 d-inline-block">{navi.title}</span>
+                </Link>
+              </NavItem>
+            ))}
           <Button
             color="danger"
             tag="a"
